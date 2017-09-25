@@ -1,4 +1,4 @@
-from . import fds as core
+from . import fds_multiple_params as core
 from . import pbs
 from . import slurm
 from . import lsstan
