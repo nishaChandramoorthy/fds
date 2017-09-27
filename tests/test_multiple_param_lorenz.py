@@ -7,9 +7,9 @@ from subprocess import *
 from numpy import *
 
 my_path = os.path.dirname(os.path.abspath(__file__))
-#sys.path.append(os.path.join(my_path, '..'))
+sys.path.append(os.path.join(my_path, '..'))
 
-from fds import *
+from fds_test import *
 
 solver_path = os.path.join(my_path, 'solvers', 'lorenz')
 solver = os.path.join(solver_path, 'solver')
@@ -20,7 +20,7 @@ def solve(u, s, nsteps):
     tmp_path = tempfile.mkdtemp()
     with open(os.path.join(tmp_path, 'input.bin'), 'wb') as f:
         f.write(asarray(u, dtype='>d').tobytes())
-    with open(os.path.join(tmp_path, 'params.bin'), 'wb') as f:
+    with open(os.path.join(tmp_path, 'param.bin'), 'wb') as f:
         f.write(asarray(s, dtype='>d').tobytes())
     call([solver, str(int(nsteps))], cwd=tmp_path)
     with open(os.path.join(tmp_path, 'output.bin'), 'rb') as f:
@@ -43,13 +43,13 @@ def test_gradient():
     for i, si in enumerate(s):
         print(i)
         print(si)
-        Ji, Gi = shadowing(solve, u0, si[0]-28, 2, 10, 1000, 5000)
-        J[i,:] = Ji
-        G[i,:] = Gi
-    assert all(abs(J[:,1] - 100) < 1E-12)
-    assert all(abs(G[:,1]) < 1E-12)
-    assert all(abs(J[:,0] - ((s-31)**2 + 85)) < 20)
-    assert all(abs(G[:,0] - (2 * (s-31))) < 2)
+        Ji, Gi = shadowing(solve, u0, si-28, 2, 10, 1000, 5000)
+        J[i,0,:] = Ji
+        G[i,0,:] = Gi
+    assert all(abs(J[:,0,1] - 100) < 1E-12)
+    assert all(abs(G[:,0,1]) < 1E-12)
+    assert all(abs(J[:,0,0] - ((s[:,0]-31)**2 + 85)) < 20)
+    assert all(abs(G[:,0,0] - (2 * (s[:,0]-31))) < 2)
 
 #if __name__ == '__main__':
 def test_lyapunov():
