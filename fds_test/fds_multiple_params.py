@@ -18,12 +18,12 @@ from .compute import run_compute
 
 # ---------------------------------------------------------------------------- #
 
-def tangent_initial_condition(subspace_dimension):
+def tangent_initial_condition(subspace_dimension,nparams):
     #np.random.seed(12)
     W = pascal.random(subspace_dimension)
     #W = (pascal.qr(W.T))[0].T
     W = pascal.qr_transpose(W)[0]
-    w = pascal.zeros()
+    w = pascal.zeros(nparams)
     return W, w
 
 def lss_gradient(checkpoint, segment_range=None):
@@ -209,7 +209,7 @@ def shadowing(
     
     
     u0 = pascal.symbolic_array(field=u0)
-
+    nparams = len(parameter)
     run = RunWrapper(run)
     manager = Manager()
     interprocess = (manager.Lock(), manager.dict())
@@ -218,7 +218,7 @@ def shadowing(
         u0 = pascal.symbolic_array(field=u0)
         #print u0.field
 
-    V, v = tangent_initial_condition(subspace_dimension)
+    V, v = tangent_initial_condition(subspace_dimension,nparams)
     lss = LssTangent()
     checkpoint = Checkpoint(u0, V, v, lss, [], [], [], [], [])
     
